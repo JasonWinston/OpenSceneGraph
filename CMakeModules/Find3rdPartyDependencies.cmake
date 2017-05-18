@@ -65,7 +65,7 @@ ENDMACRO(FIND_DEPENDENCY DEPNAME INCLUDEFILE LIBRARY_NAMES_BASE SEARCHPATHLIST D
 
 MACRO(SEARCH_3RDPARTY OSG_3RDPARTY_BIN)
         FIND_DEPENDENCY(TIFF tiff.h "libtiff;tiff" ${OSG_3RDPARTY_BIN} "D" "")
-        FIND_DEPENDENCY(FREETYPE ft2build.h "freetype;freetype2311MT;freetype234;freetype234MT;freetype235;freetype237;freetype238;freetype244;freetype250;freetype27;" ${OSG_3RDPARTY_BIN} "d" "")
+        FIND_DEPENDENCY(FREETYPE ft2build.h "freetype;freetype2311MT;freetype234;freetype234MT;freetype235;freetype237;freetype238;freetype244;freetype250;freetype27;freetype271;" ${OSG_3RDPARTY_BIN} "d" "")
         IF(FREETYPE_FOUND)
             #forcing subsequent FindFreeType stuff to not search for other variables.... kind of a hack
             SET(FREETYPE_INCLUDE_DIR_ft2build ${FREETYPE_INCLUDE_DIR} CACHE PATH "" FORCE)
@@ -92,11 +92,13 @@ MACRO(SEARCH_3RDPARTY OSG_3RDPARTY_BIN)
                 MARK_AS_ADVANCED(PNG_PNG_INCLUDE_DIR)
             ENDIF(PNG_FOUND)
         ENDIF(ZLIB_FOUND)
-        FIND_DEPENDENCY(LIBXML2 libxml2 "libxml2" ${OSG_3RDPARTY_BIN} "D" "")
+        
+        # CMakes default module to find libxml2 will not find the in
+        FIND_DEPENDENCY(LIBXML2 libxml/xpath.h "libxml2" ${OSG_3RDPARTY_BIN} "D" "")
         IF(LIBXML2_FOUND)
             # The CMAKE find libxml module uses LIBXML2_LIBRARIES -> fill it.... kind of a hack
-            SET(LIBXML2_LIBRARIES ${LIBXML2_LIBRARY} CACHE FILEPATH "" FORCE)
-            SET(LIBXML2_XMLLINT_EXECUTABLE ${OSG_3RDPARTY_BIN}/bin/xmllint.exe CACHE FILEPATH "Path to xmllint executable" FORCE)
+            SET(LIBXML2_LIBRARIES ${LIBXML2_LIBRARY} CACHE FILEPATH "LibXML2 library for collada" FORCE)
+        #    SET(LIBXML2_XMLLINT_EXECUTABLE ${OSG_3RDPARTY_BIN}/bin/xmllint.exe CACHE FILEPATH "Path to xmllint executable" FORCE)
         ENDIF(LIBXML2_FOUND)
         #FIND_DEPENDENCY(DEPNAME INCLUDEFILE LIBRARY_NAMES_BASE SEARCHPATHLIST DEBUGSUFFIX EXSUFFIX)
         FIND_Package(NVTT)
@@ -110,7 +112,7 @@ ENDMACRO(SEARCH_3RDPARTY OSG_3RDPARTY_BIN)
 # this is code for handling optional 3RDPARTY usage
 ################################################################################################
 
-OPTION(USE_3RDPARTY_BIN "Set to ON to use Mike prebuilt dependencies situated side of OpenSceneGraph source.  Use OFF for avoiding." ON)
+OPTION(USE_3RDPARTY_BIN "Set to ON to use Mike or Torbens prebuilt dependencies situated side of OpenSceneGraph source.  Use OFF for avoiding." ON)
 IF(USE_3RDPARTY_BIN)
 
     # Check Architecture

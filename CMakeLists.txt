@@ -116,7 +116,7 @@ PROJECT(OpenSceneGraph)
 SET(OPENSCENEGRAPH_MAJOR_VERSION 3)
 SET(OPENSCENEGRAPH_MINOR_VERSION 5)
 SET(OPENSCENEGRAPH_PATCH_VERSION 6)
-SET(OPENSCENEGRAPH_SOVERSION 146)
+SET(OPENSCENEGRAPH_SOVERSION 148)
 
 # set to 0 when not a release candidate, non zero means that any generated
 # git tags will be treated as release candidates of given number
@@ -239,8 +239,8 @@ IF(APPLE)
     IF(OSG_BUILD_PLATFORM_IPHONE OR OSG_BUILD_PLATFORM_IPHONE_SIMULATOR)
 
         #you need to manually set the default sdk version here
-        SET (IPHONE_SDKVER "6.0" CACHE STRING "IOS SDK-Version")
-        SET (IPHONE_VERSION_MIN "4.2" CACHE STRING "IOS minimum os version, use 7.0 or greater to get 64bit support")
+        SET (IPHONE_SDKVER "10.2" CACHE STRING "IOS SDK-Version")
+        SET (IPHONE_VERSION_MIN "7.0" CACHE STRING "IOS minimum os version, use 7.0 or greater to get 64bit support")
 
         #the below is taken from ogre, it states the gcc stuff needs to happen before PROJECT() is called. I've no clue if we even need it
         # Force gcc <= 4.2 on iPhone
@@ -499,6 +499,8 @@ ENDIF()
 IF ((OPENGL_PROFILE STREQUAL "GLES2"))
     OPTION(OSG_GLES2_AVAILABLE "Set to OFF to disable use of OpenGL ES 2.x functions library." ON )
 ELSEIF ((OPENGL_PROFILE STREQUAL "GLES3"))
+    OPTION(OSG_GLES3_AVAILABLE "Set to OFF to disable use of OpenGL ES 3.x functions library." ON )
+ELSEIF ((OPENGL_PROFILE STREQUAL "GLES2+GLES3"))
     OPTION(OSG_GLES2_AVAILABLE "Set to OFF to disable use of OpenGL ES 2.x functions library." ON )
     OPTION(OSG_GLES3_AVAILABLE "Set to OFF to disable use of OpenGL ES 3.x functions library." ON )
 ELSE()
@@ -510,7 +512,7 @@ ENDIF()
 OPTION(OSG_GL_LIBRARY_STATIC "Set to ON to statically link with OpenGL/GLES library." OFF)
 
 # Map the OSG_GL*_AVAILABLE settings to OSG_GL_* settings
-IF (OSG_GLES2_AVAILABLE OR OSG_GL3_AVAILABLE)
+IF (OSG_GLES2_AVAILABLE OR OSG_GLES3_AVAILABLE OR OSG_GL3_AVAILABLE)
     OPTION(OSG_GL_DISPLAYLISTS_AVAILABLE "Set to OFF to disable use of OpenGL display lists." OFF)
     OPTION(OSG_GL_MATRICES_AVAILABLE "Set to OFF to disable use of OpenGL built-in matrices." OFF)
     OPTION(OSG_GL_VERTEX_FUNCS_AVAILABLE "Set to OFF to disable use of OpenGL vertex functions such as glVertex/glColor etc." OFF)
@@ -530,7 +532,7 @@ ELSE()
     OPTION(OSG_GL_FIXED_FUNCTION_AVAILABLE "Set to OFF to disable use of OpenGL fixed function pipeline." ON)
 ENDIF()
 
-IF (OSG_GLES1_AVAILABLE OR OSG_GLES2_AVAILABLE)
+IF (OSG_GLES1_AVAILABLE OR OSG_GLES2_AVAILABLE OR OSG_GLES3_AVAILABLE)
     OPTION(OSG_CPP_EXCEPTIONS_AVAILABLE "Set to OFF to disable compile of OSG components that use C++ exceptions." OFF)
 ELSE()
     OPTION(OSG_CPP_EXCEPTIONS_AVAILABLE "Set to OFF to disable compile of OSG components that use C++ exceptions." ON)
@@ -568,11 +570,17 @@ ELSEIF(OSG_GLES2_AVAILABLE)
     IF (APPLE AND NOT ANDROID)
         SET(OPENGL_HEADER1 "#include \"TargetConditionals.h\"" CACHE STRING "#include<> line for OpenGL Header")
         SET(OPENGL_HEADER2 "#include <OpenGLES/ES2/gl.h>" CACHE STRING "#include<> line for additional OpenGL Headers if required")
-        # TODO: GLES3
     ELSE()
         SET(OPENGL_HEADER1 "#include <GLES2/gl2.h>" CACHE STRING "#include<> line for OpenGL Header")
         SET(OPENGL_HEADER2 "" CACHE STRING "#include<> line for additional OpenGL Headers if required")
-        # TODO: GLES3
+    ENDIF()
+ELSEIF(OSG_GLES3_AVAILABLE)
+    IF (APPLE AND NOT ANDROID)
+        SET(OPENGL_HEADER1 "#include \"TargetConditionals.h\"" CACHE STRING "#include<> line for OpenGL Header")
+        SET(OPENGL_HEADER2 "#include <OpenGLES/ES3/gl.h>" CACHE STRING "#include<> line for additional OpenGL Headers if required")
+    ELSE()
+        SET(OPENGL_HEADER1 "#include <GLES3/gl3.h>" CACHE STRING "#include<> line for OpenGL Header")
+        SET(OPENGL_HEADER2 "" CACHE STRING "#include<> line for additional OpenGL Headers if required")
     ENDIF()
 ELSE()
     IF (APPLE)
@@ -585,39 +593,39 @@ ELSE()
 ENDIF()
 
 IF (OSG_GL1_AVAILABLE)
-    SET(OSG_GL1_FEATURES "true")
+    SET(OSG_GL1_FEATURES 1)
 ELSE()
-    SET(OSG_GL1_FEATURES "false")
+    SET(OSG_GL1_FEATURES 0)
 ENDIF()
 
 IF (OSG_GL2_AVAILABLE)
-    SET(OSG_GL2_FEATURES "true")
+    SET(OSG_GL2_FEATURES 1)
 ELSE()
-    SET(OSG_GL2_FEATURES "false")
+    SET(OSG_GL2_FEATURES 0)
 ENDIF()
 
 IF (OSG_GL3_AVAILABLE)
-    SET(OSG_GL3_FEATURES "true")
+    SET(OSG_GL3_FEATURES 1)
 ELSE()
-    SET(OSG_GL3_FEATURES "false")
+    SET(OSG_GL3_FEATURES 0)
 ENDIF()
 
 IF (OSG_GLES1_AVAILABLE)
-    SET(OSG_GLES1_FEATURES "true")
+    SET(OSG_GLES1_FEATURES 1)
 ELSE()
-    SET(OSG_GLES1_FEATURES "false")
+    SET(OSG_GLES1_FEATURES 0)
 ENDIF()
 
 IF (OSG_GLES2_AVAILABLE)
-    SET(OSG_GLES2_FEATURES "true")
+    SET(OSG_GLES2_FEATURES 1)
 ELSE()
-    SET(OSG_GLES2_FEATURES "false")
+    SET(OSG_GLES2_FEATURES 0)
 ENDIF()
 
 IF (OSG_GLES3_AVAILABLE)
-    SET(OSG_GLES3_FEATURES "true")
+    SET(OSG_GLES3_FEATURES 1)
 ELSE()
-    SET(OSG_GLES3_FEATURES "false")
+    SET(OSG_GLES3_FEATURES 0)
 ENDIF()
 
 IF(ANDROID)
@@ -633,6 +641,13 @@ IF(ANDROID)
               PATHS
               ${ANDROID_SYSROOT}/usr/include)
         FIND_LIBRARY(OPENGL_gl_LIBRARY  GLESv2
+                 PATHS
+                     ${ANDROID_SYSROOT}/usr/lib)
+    ELSEIF(OSG_GLES3_AVAILABLE)
+        FIND_PATH(OPENGL_INCLUDE_DIR GLES3/gl3.h
+              PATHS
+              ${ANDROID_SYSROOT}/usr/include)
+        FIND_LIBRARY(OPENGL_gl_LIBRARY  GLESv3
                  PATHS
                      ${ANDROID_SYSROOT}/usr/lib)
     ENDIF()
@@ -700,6 +715,9 @@ OPTION(BUILD_OSG_APPLICATIONS "Enable to build OSG Applications (e.g. osgviewer)
 # OSG Examples
 OPTION(BUILD_OSG_EXAMPLES "Enable to build OSG Examples" OFF)
 
+# OSG Plugins disable option for apple build on travis ci test - full build job runs over time limit of 50 min.
+OPTION(BUILD_OSG_PLUGINS "Build OSG Plugins - Disable for compile testing examples on a time limit" ON)
+mark_as_advanced(BUILD_OSG_PLUGINS)
 ################################################################################
 # 3rd Party Dependency Stuff
 IF(WIN32 AND NOT ANDROID)
