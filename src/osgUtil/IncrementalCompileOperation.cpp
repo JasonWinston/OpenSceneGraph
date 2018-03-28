@@ -297,7 +297,7 @@ double IncrementalCompileOperation::CompileProgramOp::estimatedTimeForCompile(Co
 bool IncrementalCompileOperation::CompileProgramOp::compile(CompileInfo& compileInfo)
 {
     //OSG_NOTICE<<"CompileProgramOp::compile(..)"<<std::endl;
-    _program->apply(*compileInfo.getState());
+    _program->compileGLObjects(*compileInfo.getState());
     return true;
 }
 
@@ -332,7 +332,7 @@ double IncrementalCompileOperation::CompileList::estimatedTimeForCompile(Compile
 {
     double estimateTime = 0.0;
     for(CompileOps::const_iterator itr = _compileOps.begin();
-        itr != _compileOps.begin();
+        itr != _compileOps.end();
         ++itr)
     {
         estimateTime += (*itr)->estimatedTimeForCompile(compileInfo);
